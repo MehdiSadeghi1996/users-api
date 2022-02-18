@@ -2,6 +2,7 @@ package users
 
 import (
 	"fmt"
+	"users-api/utils/date_utils"
 	"users-api/utils/errors"
 )
 
@@ -19,5 +20,6 @@ func (user User) Get() *errors.RestErr {
 }
 
 func (user User) Save() *errors.RestErr {
+	user.DateCreated = date_utils.GetNowString()
 	return nil
 }
