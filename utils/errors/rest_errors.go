@@ -23,3 +23,11 @@ func NewNotFoundError(message string) *RestErr {
 		Error:   "notfound",
 	}
 }
+
+func NewInternalError(message string) *RestErr {
+	return &RestErr{
+		Message: message,
+		Status:  http.StatusInternalServerError,
+		Error:   "Bad guy",
+	}
+}

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"net/http"
 	"users-api/domain/users"
 	"users-api/utils/errors"
 )
@@ -10,9 +9,13 @@ func CreateUser(user users.User) (*users.User, *errors.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
-	return nil, &errors.RestErr{
-		Status: http.StatusInternalServerError,
+
+	createdUser, err := users.User.Save(user)
+	if err != nil {
+		return nil, err
 	}
+
+	return createdUser, nil
 }
 
 func GetUser(userId int64) (*users.User, *errors.RestErr) {
