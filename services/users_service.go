@@ -29,3 +29,35 @@ func GetUser(userId int64) (*users.User, *errors.RestErr) {
 	return result, nil
 
 }
+
+func UpdateUser(isPatchOrPartialUpdate bool, user users.User) (*users.User, *errors.RestErr) {
+
+	current, err := GetUser(user.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if isPatchOrPartialUpdate {
+		if user.FirstName != "" {
+			current.FirstName = user.FirstName
+		}
+		if user.FirstName != "" {
+			current.LastName = user.LastName
+		}
+		if user.FirstName != "" {
+			current.Email = user.Email
+		}
+
+	} else {
+
+		current.FirstName = user.FirstName
+		current.LastName = user.LastName
+		current.Email = user.Email
+	}
+
+	if err := current.Update(); err != nil {
+		return nil, err
+	}
+	return current, nil
+
+}
