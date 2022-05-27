@@ -9,6 +9,14 @@ import (
 	"users-api/utils/errors"
 )
 
+func getUserId(userParam string) (int64, *errors.RestErr) {
+	userId, userErr := strconv.ParseInt(userParam, 10, 64)
+	if userErr != nil {
+		return 0, errors.NewBadRequestError("user id should be numeric")
+	}
+	return userId, nil
+}
+
 func CreateUser(c *gin.Context) {
 	var user users.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -23,11 +31,11 @@ func CreateUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, result)
 }
+
 func GetUser(c *gin.Context) {
-	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
-	if userErr != nil {
-		err := errors.NewBadRequestError("user id should be numeric")
-		c.JSON(err.Status, err)
+	userId, idError := getUserId(c.Param("user_id"))
+	if idError != nil {
+		c.JSON(idError.Status, idError)
 		return
 	}
 	user, getErr := services.GetUser(userId)
@@ -42,10 +50,9 @@ func GetUser(c *gin.Context) {
 
 func UpdateUser(c *gin.Context) {
 
-	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
-	if userErr != nil {
-		err := errors.NewBadRequestError("user id should be numeric")
-		c.JSON(err.Status, err)
+	userId, idError := getUserId(c.Param("user_id"))
+	if idError != nil {
+		c.JSON(idError.Status, idError)
 		return
 	}
 	var user users.User
@@ -64,4 +71,17 @@ func UpdateUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, result)
 
+}
+
+func DeleteUser(c *gin.Context) {
+	userId, idError := getUserId(c.Param("user_id"))
+	if idError != nil {
+		c.JSON(idError.Status, idError)
+		return
+	}
+	if err := services.DeleteUser(userId); err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+	c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
